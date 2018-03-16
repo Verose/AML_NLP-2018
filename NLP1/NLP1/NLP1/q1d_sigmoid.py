@@ -21,7 +21,7 @@ def sigmoid(x):
 
 def sigmoid_grad(s):
     sub_s = 1 - s
-    ds = np.multiply([s,sub_s])
+    ds = np.multiply(s,sub_s)
     return ds
 
 def test_sigmoid_basic():

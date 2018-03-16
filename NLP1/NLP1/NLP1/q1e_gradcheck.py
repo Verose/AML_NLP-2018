@@ -27,18 +27,15 @@ def gradcheck_naive(f, x):
         # Try modifying x[ix] with h defined above to compute numerical
         # gradients (numgrad).
 
-        # Use the centered difference of the gradient.
-        # It has smaller asymptotic error than forward / backward difference
-        # methods. If you are curious, check out here:
-        # https://math.stackexchange.com/questions/2326181/when-to-use-forward-or-central-difference-approximations
-
         # Make sure you call random.setstate(rndstate)
         # before calling f(x) each time. This will make it possible
         # to test cost functions with built in randomness later.
 
-        ### YOUR CODE HERE:
-        raise NotImplementedError
-        ### END YOUR CODE
+        random.setstate(rndstate)
+        fx_h = f(x[ix] + h)
+        random.setstate(rndstate)
+        fx_minus_h = f(x[ix] - h)
+        numgrad = (fx_h[0] - fx_minus_h[0]) / (2*h)
 
         # Compare gradients
         reldiff = abs(numgrad - grad[ix]) / max(1, abs(numgrad), abs(grad[ix]))
@@ -74,10 +71,6 @@ def your_sanity_checks():
     This function will not be called by the autograder, nor will
     your additional tests be graded.
     """
-    print "Running your sanity checks..."
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
 
 
 if __name__ == "__main__":
