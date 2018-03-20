@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+
+#TODO d=3
+#delete [target,:] if didn't help
+
 import numpy as np
 import random
 
@@ -8,14 +12,8 @@ from q1e_gradcheck import gradcheck_naive
 from q1d_sigmoid import sigmoid, sigmoid_grad
 
 def normalizeRows(x):
-    """ Row normalization function
-
-    Implement a function that normalizes each row of a matrix to have
-    unit length.
-    """
-
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    norm_vec = np.linalg.norm(x,2,1)
+    x = x / norm_vec[:,None]
 
     return x
 
@@ -56,9 +54,17 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     assignment!
     """
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    #x_i(hat) for the sigmoid is u_o^Tv_i so x(hat) is vu^T
+    x_hat = np.matmul(predicted, outputVectors.T)
+    y_hat = softmax(x_hat)
+    #target index refers to y hot vecor
+    cost = -(np.log(y_hat[target]))
+
+    #using the derivative of the cost from 2a
+    gradPred = np.matmul(y_hat, outputVectors) - outputVectors[target]
+    #using the derivative of the cost from 2b
+    grad = np.outer(predicted,y_hat).transpose()
+    grad[target] -= predicted
 
     return cost, gradPred, grad
 
@@ -94,9 +100,21 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    y_hat = sigmoid(np.matmul(outputVectors,predicted))
+
+    #We use here that sigmoid(-x) = 1-sigmoid(x) as proved in the PDF
+    cost = -np.log(y_hat[target]) - np.sum([np.log(1 - y_hat[indices[1:]])])
+
+    gradPred = -(1-y_hat[target]) * outputVectors[target]
+    gradPred += np.sum((y_hat[indices[1:]] * outputVectors[indices[1:]].transpose()).transpose(),0)
+
+    #for all non negative sampling or target the grad is zero
+    grad = np.zeros(shape=outputVectors.shape)
+    #for target
+    grad[target, :] = (-1) * (1-y_hat[target]) * predicted
+    #for negative samples
+    for negative_idx in range(1,K+1):
+        grad[indices[negative_idx]] += y_hat[indices[negative_idx]] * predicted
 
     return cost, gradPred, grad
 
@@ -129,9 +147,13 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    for context_idx,context_word in enumerate(contextWords):
+        cur_cost, cur_gradPred, cur_grad = word2vecCostAndGradient(inputVectors[tokens[currentWord]],tokens[context_word],outputVectors,dataset)
+        cost += cur_cost
+        gradIn[tokens[currentWord]] += cur_gradPred
+        gradOut += cur_grad
+
+
 
     return cost, gradIn, gradOut
 

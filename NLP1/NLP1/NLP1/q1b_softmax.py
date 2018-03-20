@@ -6,13 +6,12 @@ def softmax(x):
     orig_shape = x.shape
 
     if len(x.shape) > 1:
-        x = sub_max_softmax(x)
+        x = x - np.max(x,-1)[:,np.newaxis]
         x = np.exp(x)
-        soft_norm = np.sum(x,1)
-        x = x / soft_norm
+        x = x / np.sum(x,-1)[:,np.newaxis]
 
     else:
-        x = sub_max_softmax(x)
+        x = x - np.max(x)
         x = np.exp(x)
         soft_norm = np.sum(x,0)
         x = x / soft_norm
@@ -48,12 +47,12 @@ def test_softmax_basic():
 
 
 def test_softmax():
-    pass
+    test1 = softmax(np.arange(21).reshape(3,-1))
+    print test1
 
 def sub_max_softmax(x_arr):
   max_vec = (np.amax(x_arr, axis=1))[:,None] if len(x_arr.shape) > 1 else (np.amax(x_arr, axis=0))
-  #max_vec = (np.amax(x_arr, axis=axis))[:,None]
-  x_sub = x_arr - max_vec
+  x_sub = x_arr - max_vec.reshape(len(x_arr))
   return x_sub
 
 

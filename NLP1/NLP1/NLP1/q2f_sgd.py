@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Save parameters every a few SGD iterations as fail-safe
-SAVE_PARAMS_EVERY = 5000
+SAVE_PARAMS_EVERY = 1000
 
 import glob
 import random
@@ -84,9 +84,9 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
         # You might want to print the progress every few iterations.
 
         cost = None
-        ### YOUR CODE HERE
-        raise NotImplementedError
-        ### END YOUR CODE
+        cost, derivative = f(x)
+        x -= derivative*step
+        x = postprocessing(x)
 
         if iter % PRINT_EVERY == 0:
             if not expcost:
@@ -131,9 +131,7 @@ def your_sanity_checks():
     your additional tests be graded.
     """
     print "Running your sanity checks..."
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    
 
 
 if __name__ == "__main__":

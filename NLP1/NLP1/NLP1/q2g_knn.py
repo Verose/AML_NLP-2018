@@ -17,8 +17,16 @@ def knn(vector, matrix, k=10):
 
     nearest_idx = []
 
-    ### YOUR CODE
-    ### END YOUR CODE
+    
+    dot_prod = np.matmul(matrix,vector)
+    norm_matrix = np.linalg.norm(matrix,2,1)
+    norm_vector = np.linalg.norm(vector,2)
+    norm_prod = norm_matrix * norm_vector
+    cosine_sim = dot_prod / norm_prod
+    a = np.argpartition(cosine_sim, -k)
+    nearest_idx = np.argpartition(cosine_sim, -k)[-k:]
+
+
     return nearest_idx
 
 def test_knn():

@@ -48,6 +48,22 @@ def test_sigmoid():
     This function will not be called by the autograder, nor will
     your tests be graded.
     """
+    #print "Running basic tests..."
+    #x = np.arange(21).reshape(3,-1)
+    #f = sigmoid(x)
+    #g = sigmoid_grad(f)
+    #print f
+    #f_ans = stubsig(x)
+    #assert np.allclose(f, f_ans, rtol=1e-05, atol=1e-06)
+    #print g
+    #g_ans = sigmoid_grad(f_ans)
+    #assert np.allclose(g, g_ans, rtol=1e-05, atol=1e-06)
+    #print "end my tests"
+    
+    #return s
+
+
+
     
 if __name__ == "__main__":
     test_sigmoid_basic()

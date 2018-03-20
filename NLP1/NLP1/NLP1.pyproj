@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>7f5b8787-db8d-40f2-9975-f606a0fd2f38</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>NLP1\q1e_gradcheck.py</StartupFile>
+    <StartupFile>NLP1\q1d_sigmoid.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
