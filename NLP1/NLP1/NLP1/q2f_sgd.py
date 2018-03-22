@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
+import cPickle as pickle
+import glob
+import os.path as op
+import random
+
+import numpy as np
+
+
 # Save parameters every a few SGD iterations as fail-safe
 SAVE_PARAMS_EVERY = 1000
-
-import glob
-import random
-import numpy as np
-import os.path as op
-import cPickle as pickle
 
 
 def load_saved_params():
@@ -18,7 +20,7 @@ def load_saved_params():
     st = 0
     for f in glob.glob("saved_params_*.npy"):
         iter = int(op.splitext(op.basename(f))[0].split("_")[2])
-        if (iter > st):
+        if iter > st:
             st = iter
 
     if st > 0:
@@ -36,8 +38,7 @@ def save_params(iter, params):
         pickle.dump(random.getstate(), f)
 
 
-def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
-        PRINT_EVERY=10):
+def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False, PRINT_EVERY=10):
     """ Stochastic Gradient Descent
 
     Implement the stochastic gradient descent method in this function.
@@ -85,7 +86,7 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
 
         cost = None
         cost, derivative = f(x)
-        x -= derivative*step
+        x -= derivative * step
         x = postprocessing(x)
 
         if iter % PRINT_EVERY == 0:
@@ -131,7 +132,6 @@ def your_sanity_checks():
     your additional tests be graded.
     """
     print "Running your sanity checks..."
-    
 
 
 if __name__ == "__main__":
