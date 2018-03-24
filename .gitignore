@@ -1,3 +1,7 @@
 *.vs
 *.pyproj
 *.sln
+/NLP1/NLP1/NLP1/saved_params_40000.npy
+/NLP1/NLP1/NLP1/saved_params_39000.npy
+/NLP1/NLP1/NLP1/saved_params_38000.npy
+*.suo
