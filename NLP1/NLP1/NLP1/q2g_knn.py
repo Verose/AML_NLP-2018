@@ -1,5 +1,4 @@
 import numpy as np
-from q2e_word2vec import normalizeRows
 
 
 def knn(vector, matrix, k=10):

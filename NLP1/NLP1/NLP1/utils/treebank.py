@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cPickle as pickle
-import numpy as np
 import os
 import random
 
+import numpy as np
+
+
 class StanfordSentiment:
-    def __init__(self, path=None, tablesize = 1000000):
+    def __init__(self, path=None, tablesize=1000000):
         if not path:
-            path = "utils\\datasets\\stanfordSentimentTreebank"
+            path = os.path.join('utils', 'datasets', 'stanfordSentimentTreebank')
 
         self.path = path
         self.tablesize = tablesize
@@ -27,7 +28,7 @@ class StanfordSentiment:
         for sentence in self.sentences():
             for w in sentence:
                 wordcount += 1
-                if not w in tokens:
+                if w not in tokens:
                     tokens[w] = idx
                     revtokens += [w]
                     tokenfreq[w] = 1
@@ -51,7 +52,8 @@ class StanfordSentiment:
             return self._sentences
 
         sentences = []
-        with open("C:\\Users\\Dvir\\source\\repos\\AML_NLP-2018\\NLP1\\NLP1\\NLP1\\utils\\datasets\\stanfordSentimentTreebank" + "\\datasetSentences.txt", "r") as f:
+        with open(os.path.join(os.getcwd(), self.path, 'datasetSentences.txt'),
+                  "r") as f:
             first = True
             for line in f:
                 if first:
@@ -63,8 +65,6 @@ class StanfordSentiment:
                 sentences += [[w.lower().decode("utf-8").encode('latin1') for w in splitted]]
 
         self._sentences = sentences
-        self._sentlengths = np.array([len(s) for s in sentences])
-        self._cumsentlen = np.cumsum(self._sentlengths)
 
         return self._sentences
 
@@ -83,8 +83,8 @@ class StanfordSentiment:
         rejectProb = self.rejectProb()
         tokens = self.tokens()
         allsentences = [[w for w in s
-            if 0 >= rejectProb[tokens[w]] or random.random() >= rejectProb[tokens[w]]]
-            for s in sentences * 30]
+                         if 0 >= rejectProb[tokens[w]] or random.random() >= rejectProb[tokens[w]]]
+                        for s in sentences * 30]
 
         allsentences = [s for s in allsentences if len(s) > 1]
 
@@ -94,15 +94,15 @@ class StanfordSentiment:
 
     def getRandomContext(self, C=5):
         allsent = self.allSentences()
-        sentID = random.randint(0, len(allsent) - 1)
-        sent = allsent[sentID]
-        wordID = random.randint(0, len(sent) - 1)
+        sent_id = random.randint(0, len(allsent) - 1)
+        sent = allsent[sent_id]
+        word_id = random.randint(0, len(sent) - 1)
 
-        context = sent[max(0, wordID - C):wordID]
-        if wordID+1 < len(sent):
-            context += sent[wordID+1:min(len(sent), wordID + C + 1)]
+        context = sent[max(0, word_id - C):word_id]
+        if word_id + 1 < len(sent):
+            context += sent[word_id + 1:min(len(sent), word_id + C + 1)]
 
-        centerword = sent[wordID]
+        centerword = sent[word_id]
         context = [w for w in context if w != centerword]
 
         if len(context) > 0:
@@ -119,7 +119,8 @@ class StanfordSentiment:
         with open(self.path + "/dictionary.txt", "r") as f:
             for line in f:
                 line = line.strip()
-                if not line: continue
+                if not line:
+                    continue
                 splitted = line.split("|")
                 dictionary[splitted[0].lower()] = int(splitted[1])
                 phrases += 1
@@ -133,7 +134,8 @@ class StanfordSentiment:
                     continue
 
                 line = line.strip()
-                if not line: continue
+                if not line:
+                    continue
                 splitted = line.split("|")
                 labels[int(splitted[0])] = float(splitted[1])
 
@@ -151,7 +153,7 @@ class StanfordSentiment:
         if hasattr(self, "_split") and self._split:
             return self._split
 
-        split = [[] for i in xrange(3)]
+        split = [[] for _ in xrange(3)]
         with open(self.path + "/datasetSplit.txt", "r") as f:
             first = True
             for line in f:
@@ -167,8 +169,8 @@ class StanfordSentiment:
 
     def getRandomTrainSentence(self):
         split = self.dataset_split()
-        sentId = split[0][random.randint(0, len(split[0]) - 1)]
-        return self.sentences()[sentId], self.categorify(self.sent_labels()[sentId])
+        sent_id = split[0][random.randint(0, len(split[0]) - 1)]
+        return self.sentences()[sent_id], self.categorify(self.sent_labels()[sent_id])
 
     def categorify(self, label):
         if label <= 0.2:
@@ -199,11 +201,11 @@ class StanfordSentiment:
         if hasattr(self, '_sampleTable') and self._sampleTable is not None:
             return self._sampleTable
 
-        nTokens = len(self.tokens())
-        samplingFreq = np.zeros((nTokens,))
+        n_tokens = len(self.tokens())
+        sampling_freq = np.zeros((n_tokens,))
         self.allSentences()
         i = 0
-        for w in xrange(nTokens):
+        for w in xrange(n_tokens):
             w = self._revtokens[i]
             if w in self._tokenfreq:
                 freq = 1.0 * self._tokenfreq[w]
@@ -211,17 +213,17 @@ class StanfordSentiment:
                 freq = freq ** 0.75
             else:
                 freq = 0.0
-            samplingFreq[i] = freq
+            sampling_freq[i] = freq
             i += 1
 
-        samplingFreq /= np.sum(samplingFreq)
-        samplingFreq = np.cumsum(samplingFreq) * self.tablesize
+        sampling_freq /= np.sum(sampling_freq)
+        sampling_freq = np.cumsum(sampling_freq) * self.tablesize
 
         self._sampleTable = [0] * self.tablesize
 
         j = 0
         for i in xrange(self.tablesize):
-            while i > samplingFreq[j]:
+            while i > sampling_freq[j]:
                 j += 1
             self._sampleTable[i] = j
 
@@ -233,15 +235,15 @@ class StanfordSentiment:
 
         threshold = 1e-5 * self._wordcount
 
-        nTokens = len(self.tokens())
-        rejectProb = np.zeros((nTokens,))
-        for i in xrange(nTokens):
+        n_tokens = len(self.tokens())
+        reject_prob = np.zeros((n_tokens,))
+        for i in xrange(n_tokens):
             w = self._revtokens[i]
             freq = 1.0 * self._tokenfreq[w]
             # Reweigh
-            rejectProb[i] = max(0, 1 - np.sqrt(threshold / freq))
+            reject_prob[i] = max(0, 1 - np.sqrt(threshold / freq))
 
-        self._rejectProb = rejectProb
+        self._rejectProb = reject_prob
         return self._rejectProb
 
     def sampleTokenIdx(self):

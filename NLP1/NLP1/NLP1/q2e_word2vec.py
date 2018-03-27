@@ -4,12 +4,13 @@
 # TODO d=3
 # delete [target,:] if didn't help
 
-import numpy as np
 import random
 
+import numpy as np
+
 from q1b_softmax import softmax
+from q1d_sigmoid import sigmoid
 from q1e_gradcheck import gradcheck_naive
-from q1d_sigmoid import sigmoid, sigmoid_grad
 
 
 def normalizeRows(x):
@@ -28,7 +29,7 @@ def test_normalize_rows():
     print ""
 
 
-def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
+def softmaxCostAndGradient(predicted, target, output_vectors, dataset):
     """ Softmax cost function for word2vec models
 
     Implement the cost and gradients for one predicted word vector
@@ -45,7 +46,7 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
 
     Return:
     cost -- cross entropy cost for the softmax word prediction
-    gradPred -- the gradient with respect to the predicted word
+    grad_pred -- the gradient with respect to the predicted word
            vector
     grad -- the gradient with respect to all the other word
            vectors
@@ -56,18 +57,18 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     """
 
     # x_i(hat) for the sigmoid is u_o^Tv_i so x(hat) is vu^T
-    x_hat = np.matmul(predicted, outputVectors.T)
+    x_hat = np.matmul(predicted, output_vectors.T)
     y_hat = softmax(x_hat)
     # target index refers to y hot vecor
     cost = -(np.log(y_hat[target]))
 
     # using the derivative of the cost from 2a
-    gradPred = np.matmul(y_hat, outputVectors) - outputVectors[target]
+    grad_pred = np.matmul(y_hat, output_vectors) - output_vectors[target]
     # using the derivative of the cost from 2b
     grad = np.outer(predicted, y_hat).transpose()
     grad[target] -= predicted
 
-    return cost, gradPred, grad
+    return cost, grad_pred, grad
 
 
 def getNegativeSamples(target, dataset, K):
@@ -106,8 +107,8 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     # We use here that sigmoid(-x) = 1-sigmoid(x) as proved in the PDF
     cost = -np.log(y_hat[target]) - np.sum([np.log(1 - y_hat[indices[1:]])])
 
-    gradPred = -(1 - y_hat[target]) * outputVectors[target]
-    gradPred += np.sum((y_hat[indices[1:]] * outputVectors[indices[1:]].transpose()).transpose(), 0)
+    grad_pred = -(1 - y_hat[target]) * outputVectors[target]
+    grad_pred += np.sum((y_hat[indices[1:]] * outputVectors[indices[1:]].transpose()).transpose(), 0)
 
     # for all non negative sampling or target the grad is zero
     grad = np.zeros(shape=outputVectors.shape)
@@ -117,11 +118,11 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     for negative_idx in range(1, K + 1):
         grad[indices[negative_idx]] += y_hat[indices[negative_idx]] * predicted
 
-    return cost, gradPred, grad
+    return cost, grad_pred, grad
 
 
-def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
-             dataset, word2vecCostAndGradient=softmaxCostAndGradient):
+def skipgram(current_word, C, context_words, tokens, input_vectors, output_vectors,
+             dataset, word2vec_cost_and_gradient=softmaxCostAndGradient):
     """ Skip-gram model in word2vec
 
     Implement the skip-gram model in this function.
@@ -145,43 +146,43 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     """
 
     cost = 0.0
-    gradIn = np.zeros(inputVectors.shape)
-    gradOut = np.zeros(outputVectors.shape)
+    grad_in = np.zeros(input_vectors.shape)
+    grad_out = np.zeros(output_vectors.shape)
 
-    for context_idx, context_word in enumerate(contextWords):
-        cur_cost, cur_gradPred, cur_grad = word2vecCostAndGradient(inputVectors[tokens[currentWord]],
-                                                                   tokens[context_word], outputVectors, dataset)
+    for context_idx, context_word in enumerate(context_words):
+        cur_cost, cur_grad_pred, cur_grad = word2vec_cost_and_gradient(input_vectors[tokens[current_word]],
+                                                                       tokens[context_word], output_vectors, dataset)
         cost += cur_cost
-        gradIn[tokens[currentWord]] += cur_gradPred
-        gradOut += cur_grad
+        grad_in[tokens[current_word]] += cur_grad_pred
+        grad_out += cur_grad
 
-    return cost, gradIn, gradOut
+    return cost, grad_in, grad_out
 
 
 #############################################
 # Testing functions below. DO NOT MODIFY!   #
 #############################################
 
-def word2vec_sgd_wrapper(word2vecModel, tokens, wordVectors, dataset, C,
-                         word2vecCostAndGradient=softmaxCostAndGradient):
+def word2vec_sgd_wrapper(word2vec_model, tokens, word_vectors, dataset, C,
+                         word2vec_cost_and_gradient=softmaxCostAndGradient):
     batchsize = 50
     cost = 0.0
-    grad = np.zeros(wordVectors.shape)
-    N = wordVectors.shape[0]
-    inputVectors = wordVectors[:N / 2, :]
-    outputVectors = wordVectors[N / 2:, :]
+    grad = np.zeros(word_vectors.shape)
+    N = word_vectors.shape[0]
+    input_vectors = word_vectors[:N / 2, :]
+    output_vectors = word_vectors[N / 2:, :]
     for i in xrange(batchsize):
         C1 = random.randint(1, C)
         centerword, context = dataset.getRandomContext(C1)
 
-        if word2vecModel == skipgram:
+        if word2vec_model == skipgram:
             denom = 1
         else:
             denom = 1
 
-        c, gin, gout = word2vecModel(
-            centerword, C1, context, tokens, inputVectors, outputVectors,
-            dataset, word2vecCostAndGradient)
+        c, gin, gout = word2vec_model(
+            centerword, C1, context, tokens, input_vectors, output_vectors,
+            dataset, word2vec_cost_and_gradient)
         cost += c / batchsize / denom
         grad[:N / 2, :] += gin / batchsize / denom
         grad[N / 2:, :] += gout / batchsize / denom
@@ -198,7 +199,7 @@ def test_word2vec():
 
     def getRandomContext(C):
         tokens = ["a", "b", "c", "d", "e"]
-        return tokens[random.randint(0, 4)], [tokens[random.randint(0, 4)] for i in xrange(2 * C)]
+        return tokens[random.randint(0, 4)], [tokens[random.randint(0, 4)] for _ in xrange(2 * C)]
 
     dataset.sampleTokenIdx = dummySampleTokenIdx
     dataset.getRandomContext = getRandomContext
