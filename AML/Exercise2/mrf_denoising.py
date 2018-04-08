@@ -60,8 +60,8 @@ class Vertex(object):
             best_msg_lbl[LABEL] = best_msg
             soft_max += best_msg
         for LABEL in LABELS:
-            msg_delta += queried_neigh._in_msgs[self][LABEL] - best_msg_lbl[LABEL]/soft_max
-            queried_neigh._in_msgs[self][LABEL] = best_msg_lbl[LABEL]/soft_max
+            msg_delta += queried_neigh._in_msgs[self][LABEL] - best_msg_lbl[LABEL] / soft_max
+            queried_neigh._in_msgs[self][LABEL] = best_msg_lbl[LABEL] / soft_max
         if(msg_delta > epsilon):
            return msg_delta 
         else:
@@ -222,7 +222,7 @@ def main():
     
     # run the lbp NUM iterations or until convergence
     ITERATIONS = 20
-    EPSILON = 0.0000000001
+    EPSILON = numpy.power(10.,-5)
     for iter in range(ITERATIONS):
         delta_counter = 0
         for vertex in g.vertices():
@@ -230,9 +230,8 @@ def main():
                 delta_counter += 1 if (vertex.LBP(neigh,EPSILON)) > 0 else 0
         if (delta_counter == 0):
             break
-        print iter
 
-    # convert grid to image: 
+    # convert grid to image:
     infered_img = grid2mat(g, n, m)
     if PLOT:
         plt.imshow(infered_img)
