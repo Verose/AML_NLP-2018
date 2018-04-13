@@ -6,6 +6,7 @@
 from utils import invert_dict
 from numpy import *
 
+
 def load_wv(vocabfile, wvfile):
     wv = loadtxt(wvfile, dtype=float)
     with open(vocabfile) as fd:

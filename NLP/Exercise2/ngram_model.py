@@ -7,7 +7,7 @@ import csv
 
 # Load the vocabulary
 vocab = pd.read_table("data/lm/vocab.ptb.txt", header=None, sep="\s+",
-                     index_col=0, names=['count', 'freq'], )
+                      index_col=0, names=['count', 'freq'], )
 
 # Choose how many top words to keep
 vocabsize = 2000
@@ -20,6 +20,7 @@ S_train = du.docs_to_indices(docs_train, word_to_num)
 docs_dev = du.load_dataset('data/lm/ptb-dev.txt')
 S_dev = du.docs_to_indices(docs_dev, word_to_num)
 
+
 def train_ngrams(dataset):
     """
         Gets an array of arrays of indexes, each one corresponds to a word.
@@ -29,10 +30,11 @@ def train_ngrams(dataset):
     bigram_counts = dict()
     unigram_counts = dict()
     token_count = 0
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
     ### END YOUR CODE
     return trigram_counts, bigram_counts, unigram_counts, token_count
+
 
 def evaluate_ngrams(eval_dataset, trigram_counts, bigram_counts, unigram_counts, train_token_count, lambda1, lambda2):
     """
@@ -40,16 +42,17 @@ def evaluate_ngrams(eval_dataset, trigram_counts, bigram_counts, unigram_counts,
     the current counts and a linear interpolation
     """
     perplexity = 0
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
+    # END YOUR CODE
     return perplexity
+
 
 def test_ngram():
     """
     Use this space to test your n-gram implementation.
     """
-    #Some examples of functions usage
+    # Some examples of functions usage
     trigram_counts, bigram_counts, unigram_counts, token_count = train_ngrams(S_train)
     print "#trigrams: " + str(len(trigram_counts))
     print "#bigrams: " + str(len(bigram_counts))
@@ -57,8 +60,9 @@ def test_ngram():
     print "#tokens: " + str(token_count)
     perplexity = evaluate_ngrams(S_dev, trigram_counts, bigram_counts, unigram_counts, token_count, 0.5, 0.4)
     print "#perplexity: " + str(perplexity)
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    # YOUR CODE HERE
+    # END YOUR CODE
+
 
 if __name__ == "__main__":
     test_ngram()

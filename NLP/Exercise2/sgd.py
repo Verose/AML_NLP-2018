@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-# Save parameters every a few SGD iterations as fail-safe
-SAVE_PARAMS_EVERY = 5000
-
 import glob
 import random
 import numpy as np
 import os.path as op
-import cPickle as pickle
+import cPickle as Pickle
+
+# Save parameters every a few SGD iterations as fail-safe
+SAVE_PARAMS_EVERY = 5000
 
 
 def load_saved_params():
@@ -17,26 +17,26 @@ def load_saved_params():
     """
     st = 0
     for f in glob.glob("saved_params_*.npy"):
-        iter = int(op.splitext(op.basename(f))[0].split("_")[2])
-        if (iter > st):
-            st = iter
+        it = int(op.splitext(op.basename(f))[0].split("_")[2])
+        if it > st:
+            st = it
 
     if st > 0:
         with open("saved_params_%d.npy" % st, "r") as f:
-            params = pickle.load(f)
-            state = pickle.load(f)
+            params = Pickle.load(f)
+            state = Pickle.load(f)
         return st, params, state
     else:
         return st, None, None
 
 
-def save_params(iter, params):
-    with open("saved_params_%d.npy" % iter, "w") as f:
-        pickle.dump(params, f)
-        pickle.dump(random.getstate(), f)
+def save_params(it, params):
+    with open("saved_params_%d.npy" % it, "w") as f:
+        Pickle.dump(params, f)
+        Pickle.dump(random.getstate(), f)
 
 
-def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
+def sgd(f, x0, step, iterations, postprocessing=None, use_saved=False,
         PRINT_EVERY=10):
     """ Stochastic Gradient Descent
 
@@ -61,7 +61,7 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
     # Anneal learning rate every several iterations
     ANNEAL_EVERY = 20000
 
-    if useSaved:
+    if use_saved:
         start_iter, oldx, state = load_saved_params()
         if start_iter > 0:
             x0 = oldx
@@ -79,26 +79,26 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
 
     expcost = None
 
-    for iter in xrange(start_iter + 1, iterations + 1):
+    for it in xrange(start_iter + 1, iterations + 1):
         # Don't forget to apply the postprocessing after every iteration!
         # You might want to print the progress every few iterations.
 
         cost = None
-        ### YOUR CODE HERE
+        # YOUR CODE HERE
         raise NotImplementedError
-        ### END YOUR CODE
+        # END YOUR CODE
 
-        if iter % PRINT_EVERY == 0:
+        if it % PRINT_EVERY == 0:
             if not expcost:
                 expcost = cost
             else:
                 expcost = .95 * expcost + .05 * cost
-            print "iter %d: %f" % (iter, expcost)
+            print "it %d: %f" % (it, expcost)
 
-        if iter % SAVE_PARAMS_EVERY == 0 and useSaved:
-            save_params(iter, x)
+        if it % SAVE_PARAMS_EVERY == 0 and use_saved:
+            save_params(it, x)
 
-        if iter % ANNEAL_EVERY == 0:
+        if it % ANNEAL_EVERY == 0:
             step *= 0.5
 
     return x
@@ -131,9 +131,9 @@ def your_sanity_checks():
     your additional tests be graded.
     """
     print "Running your sanity checks..."
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
+    # END YOUR CODE
 
 
 if __name__ == "__main__":

@@ -14,9 +14,9 @@ def sigmoid(x):
     s -- sigmoid(x)
     """
 
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
+    # END YOUR CODE
 
     return s
 
@@ -34,9 +34,9 @@ def sigmoid_grad(s):
     ds -- Your computed gradient.
     """
 
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
+    # END YOUR CODE
 
     return ds
 
@@ -71,9 +71,9 @@ def test_sigmoid():
     your tests be graded.
     """
     print "Running your tests..."
-    ### YOUR CODE HERE
+    # YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
+    # END YOUR CODE
 
 
 if __name__ == "__main__":
