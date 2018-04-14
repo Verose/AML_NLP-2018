@@ -10,13 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 PLOT = True
-LABELS = [-1.,1.]
+LABELS = [-1., 1.]
 alpha = 0.28
 beta = 0.1
 
 
 class Vertex(object):
-    def __init__(self, idx,row, col, name='', y=None, neighs=None, in_msgs=None):
+    def __init__(self, idx, row, col, name='', y=None, neighs=None, in_msgs=None):
         self._name = name
         self._y = y  # original pixel
         self.row = row
@@ -33,49 +33,49 @@ class Vertex(object):
     def add_neigh(self, vertex):
         self._neighs.add(vertex)
 
-        #initialize messages to zero for each label
-        self._in_msgs[vertex] = {1. : 1, -1. : 1}
+        # initialize messages to zero for each label
+        self._in_msgs[vertex] = {1.: 1, -1.: 1}
 
     def rem_neigh(self, vertex):
         self._neighs.remove(vertex)
 
-    def log_data_term(self,LABEL):
-        return np.exp(alpha * LABEL * self._y)
-    def log_smoothness_term(self,my_label,neigh_label):
+    def log_data_term(self, label):
+        return np.exp(alpha * label * self._y)
+
+    def log_smoothness_term(self, my_label, neigh_label):
         return np.exp(beta * my_label * neigh_label)
 
-    def LBP(self,queried_neigh,epsilon):
-        assert isinstance(queried_neigh,Vertex)
+    def lbp(self, queried_neigh, epsilon):
+        assert isinstance(queried_neigh, Vertex)
         soft_max = 0
         msg_delta = 0
-        best_msg_lbl = {1. : -sys.maxint, -1. : -sys.maxint}
-        for LABEL in LABELS:
+        best_msg_lbl = {1.: -sys.maxint, -1.: -sys.maxint}
+        for label in LABELS:
             best_msg = -sys.maxint
             for sender_lbl in LABELS:
-                cur_match = self.log_data_term(sender_lbl) * self.log_smoothness_term(sender_lbl,LABEL)
+                cur_match = self.log_data_term(sender_lbl) * self.log_smoothness_term(sender_lbl, label)
                 neigh_lst = [neigh for neigh in self._neighs if neigh is not queried_neigh]
                 for neigh in neigh_lst:
                     cur_match *= self._in_msgs[neigh][sender_lbl]
                 best_msg = max(cur_match, best_msg)
-            best_msg_lbl[LABEL] = best_msg
+            best_msg_lbl[label] = best_msg
             soft_max += best_msg
-        for LABEL in LABELS:
-            msg_delta += queried_neigh._in_msgs[self][LABEL] - best_msg_lbl[LABEL] / soft_max
-            queried_neigh._in_msgs[self][LABEL] = best_msg_lbl[LABEL] / soft_max
-        if(msg_delta > epsilon):
-           return msg_delta 
+        for label in LABELS:
+            msg_delta += queried_neigh._in_msgs[self][label] - best_msg_lbl[label] / soft_max
+            queried_neigh._in_msgs[self][label] = best_msg_lbl[label] / soft_max
+        if msg_delta > epsilon:
+            return msg_delta
         else:
-           return 0
-            
+            return 0
 
     def get_belief(self):
         (self.belief, best_value) = (1., -sys.maxint)
-        for LABEL in LABELS:
+        for label in LABELS:
             import operator
-            mul_messages = reduce(operator.mul, [self._in_msgs[neigh][LABEL] for neigh in self._neighs], 1)
-            cur_value = self.log_data_term(LABEL) * mul_messages
+            mul_messages = reduce(operator.mul, [self._in_msgs[neigh][label] for neigh in self._neighs], 1)
+            cur_value = self.log_data_term(label) * mul_messages
             if cur_value > best_value:
-                (self.belief, best_value) = (LABEL,cur_value)
+                (self.belief, best_value) = (label, cur_value)
         return self.belief
 
     def snd_msg(self, neigh):
@@ -105,11 +105,11 @@ class Graph(object):
 
     def vertices(self):
         """ returns the vertices of a graph"""
-        return sorted(list(self._graph_dict.keys()), key=lambda vertex : vertex.idx)
+        return sorted(list(self._graph_dict.keys()), key=lambda vertex: vertex.idx)
 
     def edges(self):
         """ returns the edges of a graph """
-        return self._generate_edges()
+        return self.generate_edges()
 
     def add_vertex(self, vertex):
         """ If the vertex "vertex" is not in
@@ -152,7 +152,7 @@ class Graph(object):
         for k in self._graph_dict:
             res += str(k) + " "
         res += "\nE: "
-        for edge in self._generate_edges():
+        for edge in self.generate_edges():
             res += str(edge) + " "
         return res
 
@@ -190,7 +190,7 @@ def grid2mat(grid, n, m):
     mat = np.zeros((n, m))
     l = grid.vertices()  # list of vertices
     for v in l:
-        assert isinstance(v,Vertex)
+        assert isinstance(v, Vertex)
         i = int(v._name[1:])
         row, col = (i // m, i % m)
         mat[row][col] = v.get_belief()
@@ -202,6 +202,7 @@ def main():
     if len(sys.argv) < 3:
         print 'Please specify input and output file names.'
         exit(0)
+
     # load image:
     in_file_name = sys.argv[1]
     image = misc.imread(in_file_name + '.png')
@@ -211,6 +212,7 @@ def main():
     image = image.astype(np.float32)
     image[image < 128] = -1.
     image[image > 127] = 1.
+
     if PLOT:
         plt.imshow(image)
         plt.show()
@@ -218,28 +220,27 @@ def main():
     # build grid:
     g = build_grid_graph(n, m, image)
 
-    # process grid:
-    
-    # run the lbp NUM iterations or until convergence
-    ITERATIONS = 20
-    EPSILON = numpy.power(10.,-5)
-    for iter in range(ITERATIONS):
+    # run the lbp #iterations or until convergence
+    iterations = 20
+    epsilon = np.power(10., -5)
+    for _ in range(iterations):
         delta_counter = 0
         for vertex in g.vertices():
             for neigh in vertex._neighs:
-                delta_counter += 1 if (vertex.LBP(neigh,EPSILON)) > 0 else 0
-        if (delta_counter == 0):
+                delta_counter += 1 if (vertex.lbp(neigh, epsilon)) > 0 else 0
+        if delta_counter == 0:
             break
 
     # convert grid to image:
-    infered_img = grid2mat(g, n, m)
+    inferred_img = grid2mat(g, n, m)
+
     if PLOT:
-        plt.imshow(infered_img)
+        plt.imshow(inferred_img)
         plt.show()
 
-     #save result to output file
+    # save result to output file
     out_file_name = sys.argv[2]
-    misc.toimage(infered_img).save(out_file_name + '.png')
+    misc.toimage(inferred_img).save(out_file_name + '.png')
 
 
 if __name__ == "__main__":
