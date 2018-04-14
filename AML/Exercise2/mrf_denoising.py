@@ -11,8 +11,8 @@ import numpy as np
 
 PLOT = True
 LABELS = [-1., 1.]
-alpha = 0.28
-beta = 0.1
+alpha = 0.9
+beta = 0.5
 
 
 class Vertex(object):
