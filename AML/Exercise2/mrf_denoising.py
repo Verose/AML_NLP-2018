@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Mar 30 14:35:26 2017
 
-@author: carmonda
-"""
 import sys
 from scipy import misc
 import matplotlib.pyplot as plt
 import numpy as np
 
-PLOT = True
+PLOT = False
 LABELS = [-1., 1.]
-alpha = 0.28
-beta = 0.1
+alpha = 0.9
+beta = 0.5
 
 
 class Vertex(object):
@@ -205,7 +201,7 @@ def main():
 
     # load image:
     in_file_name = sys.argv[1]
-    image = misc.imread(in_file_name + '.png')
+    image = misc.imread(in_file_name)
     n, m = image.shape
 
     # binarize the image.
@@ -240,7 +236,7 @@ def main():
 
     # save result to output file
     out_file_name = sys.argv[2]
-    misc.toimage(inferred_img).save(out_file_name + '.png')
+    misc.toimage(inferred_img).save(out_file_name)
 
 
 if __name__ == "__main__":
