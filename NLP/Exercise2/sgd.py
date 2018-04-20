@@ -83,9 +83,11 @@ def sgd(f, x0, step, iterations, postprocessing=None, use_saved=False,
         # Don't forget to apply the postprocessing after every iteration!
         # You might want to print the progress every few iterations.
 
+        # YOUR CODE HERE
         cost, derivative = f(x)
         x -= derivative * step
         x = postprocessing(x)
+        # END YOUR CODE
 
         if it % PRINT_EVERY == 0:
             if not expcost:

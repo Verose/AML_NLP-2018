@@ -31,12 +31,12 @@ def load_vocab_embeddings(path=VOCAB_EMBEDDING_PATH):
 
 def load_data_as_sentences(path, word_to_num):
     """
-    Conv:erts the training data to an array of integer arrays.
-      args: 
+    Converts the training data to an array of integer arrays.
+      args:
         path: string pointing to the training data
         word_to_num: A dictionary from string words to integers
       returns:
-        An array of integer arrays. Each array is a sentence and each 
+        An array of integer arrays. Each array is a sentence and each
         integer is a word.
     """
     docs_data = du.load_dataset(path)
@@ -48,8 +48,8 @@ def convert_to_lm_dataset(S):
     """
     Takes a dataset that is a list of sentences as an array of integer arrays.
     Returns the dataset a bigram prediction problem. For any word, predict the
-    next work. 
-    IMPORTANT: we have two padding tokens at the beginning but since we are 
+    next work.
+    IMPORTANT: we have two padding tokens at the beginning but since we are
     training a bigram model, only one will be used.
     """
     in_word_index, out_word_index = [], []
@@ -78,9 +78,14 @@ def lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions,
     data = np.zeros([BATCH_SIZE, input_dim])
     labels = np.zeros([BATCH_SIZE, output_dim])
 
-    # Construct the data batch and run you backpropogation implementation
+    # Construct the data batch and run your backpropogation implementation
     # YOUR CODE HERE
-    raise NotImplementedError
+    indices_in_batch = np.random.randint(0, len(in_word_index), BATCH_SIZE)
+    for i, batch_ind in enumerate(indices_in_batch):
+        data[i, :] = num_to_word_embedding[in_word_index[batch_ind]]
+        labels[i, :] = int_to_one_hot(out_word_index[batch_ind], dimensions[2])
+
+    cost, grad = forward_backward_prop(data, labels, params, dimensions)
     # END YOUR CODE
 
     cost /= BATCH_SIZE
@@ -99,7 +104,15 @@ def eval_neural_lm(eval_data_path):
 
     perplexity = 0
     # YOUR CODE HERE
-    raise NotImplementedError
+    costs = np.zeros(num_of_examples)
+
+    for i in xrange(num_of_examples):
+        data = num_to_word_embedding[in_word_index[i]]
+        label = out_word_index[i]
+        costs[i] = forward(data, label, params, dimensions)
+
+    l = np.sum(np.log2(costs)) / num_of_examples
+    perplexity = np.power(2, -l)
     # END YOUR CODE
 
     return perplexity
