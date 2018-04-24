@@ -47,7 +47,7 @@ def count_bigram(dataset):
     bigram_counts = defaultdict(lambda: 0)
 
     for idx,sentence in enumerate(dataset):
-        for word_idx in range(2,len(sentence)):
+        for word_idx in range(1,len(sentence)):
             bigram_counts[(sentence[word_idx],sentence[word_idx-1])] += 1
         if(idx % checkpoint == 0):
             print idx
@@ -60,10 +60,13 @@ def count_bigram(dataset):
 
 def count_unigram(dataset):
     unigram_counts = defaultdict(lambda: 0)
+    tokens_count = 0
 
     for idx,sentence in enumerate(dataset):
-        for word_idx in range(2,len(sentence)):
+        for word_idx in range(1,len(sentence)):
             unigram_counts[(sentence[word_idx])] += 1
+            tokens_count += 1
+        tokens_count -= 1
         if(idx % checkpoint == 0):
             print idx
             with open('unigram_counts' + str(idx) + '.pkl', 'wb') as f:
@@ -71,7 +74,7 @@ def count_unigram(dataset):
     with open('unigram_counts' + str(len(dataset)) + '.pkl', 'wb') as f:
         pickle.dump(dict(unigram_counts), f, pickle.HIGHEST_PROTOCOL)
     print "end unigram_count"
-    return dict(unigram_counts)
+    return dict(unigram_counts) ,tokens_count
 
 
 def train_ngrams(dataset):
@@ -85,10 +88,7 @@ def train_ngrams(dataset):
     token_count = 0
     trigram_counts = count_trigram(dataset)
     bigram_counts = count_bigram(dataset)
-    unigram_counts = count_unigram(dataset)
-
-    #don't count * words
-    token_count = len(list(chain.from_iterable(dataset))) - len(dataset) * 2
+    unigram_counts, token_count = count_unigram(dataset)
 
     return trigram_counts, bigram_counts, unigram_counts, token_count
 
@@ -105,13 +105,20 @@ def evaluate_ngrams(eval_dataset, trigram_counts, bigram_counts, unigram_counts,
         for word_idx in range(2,len(sentence)):
             if((sentence[word_idx],sentence[word_idx-1],sentence[word_idx-2]) in  trigram_counts):
                 c_tri = trigram_counts[(sentence[word_idx],sentence[word_idx-1],sentence[word_idx-2])]
+                c_tri_devidor = bigram_counts[(sentence[word_idx-1],sentence[word_idx-2])]
             else:
                 c_tri = 0.
+                c_tri_devidor = 0.
+
+            
+
 
             if((sentence[word_idx],sentence[word_idx-1]) in  bigram_counts):
                 c_bi = bigram_counts[(sentence[word_idx],sentence[word_idx-1])]
+                c_bi_devidor = unigram_counts[(sentence[word_idx-1])]
             else:
                 c_bi = 0.
+                c_bi_devidor = 0.
 
             if((sentence[word_idx]) in unigram_counts):
                 c_uni = unigram_counts[(sentence[word_idx])]
@@ -120,8 +127,8 @@ def evaluate_ngrams(eval_dataset, trigram_counts, bigram_counts, unigram_counts,
 
 
             
-            trivalue = lambda1 * (c_tri /c_bi) if c_bi > 0 else 0
-            bivalue = lambda2 * (c_bi /c_uni) if c_uni > 0 else 0
+            trivalue = lambda1 * (c_tri /c_tri_devidor) if c_tri > 0 else 0
+            bivalue = lambda2 * (c_bi /c_bi_devidor) if c_bi > 0 else 0
             univalue = (1-lambda1-lambda2) * (c_uni /train_token_count)
 
 

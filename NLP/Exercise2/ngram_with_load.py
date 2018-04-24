@@ -19,8 +19,8 @@ import pickle
 
 ### Load the training set
 
-#S_train = np.load('test_save_s.npy')
-#S_dev = np.load('test_save_DEV.npy')
+S_train = np.load('test_save_s.npy')
+S_dev = np.load('test_save_DEV.npy')
 
 checkpoint = 1000
 #TODO delete save gates
@@ -165,11 +165,11 @@ def test_ngram():
     Use this space to test your n-gram implementation.
     """
     #Some examples of functions usage
-    #trigram_counts, bigram_counts, unigram_counts, token_count = train_ngrams(S_train)
-    #print "#trigrams: " + str(len(trigram_counts))
-    #print "#bigrams: " + str(len(bigram_counts))
-    #print "#unigrams: " + str(len(unigram_counts))
-    #print "#tokens: " + str(token_count)
+    trigram_counts, bigram_counts, unigram_counts, token_count = train_ngrams(S_train)
+    print "#trigrams: " + str(len(trigram_counts))
+    print "#bigrams: " + str(len(bigram_counts))
+    print "#unigrams: " + str(len(unigram_counts))
+    print "#tokens: " + str(token_count)
     #perplexity = evaluate_ngrams(S_dev, trigram_counts, bigram_counts, unigram_counts, token_count, 0.5, 0.4)
     #print "#perplexity: " + str(perplexity)
     lambda_perplexity_dict = grid_search_lamdas(S_dev, trigram_counts, bigram_counts, unigram_counts, token_count)
