@@ -1,12 +1,7 @@
 *.vs
 *.pyproj
 *.sln
-/NLP1/NLP1/NLP1/saved_params_40000.npy
-/NLP1/NLP1/NLP1/saved_params_39000.npy
-/NLP1/NLP1/NLP1/saved_params_38000.npy
 *.suo
-/AML/Exercise2/.localhistory
-/NLP1/NLP1/NLP1
-/NLP/Exercise2/.localhistory
-/NLP/Exercise2/~$P 2_dvir.docx
-/NLP/Exercise2/~$rd_dvir.docx
+*.localhistory
+*saved_params*.npy
+*.docx
