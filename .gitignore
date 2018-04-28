@@ -5,3 +5,6 @@
 *.localhistory
 *saved_params*.npy
 *.docx
+*.pyc
+*.idea/
+*venv/
