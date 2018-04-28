@@ -1,3 +1,4 @@
+
 from __future__ import division
 from data import *
 from sklearn.feature_extraction import DictVectorizer
@@ -213,6 +214,8 @@ def memm_eval(test_data, test_data_vectorized, logreg, vec, index_to_tag_dict, f
                 raise NotImplementedError
             eval_end_timer = time.time()
             print str.format("Sentence index: {} greedy_acc: {}    Viterbi_acc:{} , elapsed: {} ,total time(minutes): {}", str(i), str(acc_greedy), str(acc_viterbi) , str (eval_end_timer - eval_mid_timer), str ((eval_end_timer - eval_start_timer) / 60))
+            pkl.dump( greedy_tags, open( "greedy_tags" + str(i) + ".p", "wb" ) )
+            pkl.dump( viterbi_tags, open( "viterbi_tags" + str(i) + ".p", "wb" ) )
             eval_mid_timer = time.time()
 
     return str(acc_viterbi), str(acc_greedy)
@@ -236,58 +239,84 @@ num_dev_examples = 40117
 if __name__ == "__main__":
     full_flow_start = time.time()
     print (get_details())
-    train_sents = read_conll_pos_file("Penn_Treebank/train.gold.conll")
-    dev_sents = read_conll_pos_file("Penn_Treebank/dev.gold.conll")
+    #train_sents = read_conll_pos_file("Penn_Treebank/train.gold.conll")
+    #dev_sents = read_conll_pos_file("Penn_Treebank/dev.gold.conll")
 
-    vocab = compute_vocab_count(train_sents)
-    train_sents = preprocess_sent(vocab, train_sents)
-    dev_sents = preprocess_sent(vocab, dev_sents)
+    #vocab = compute_vocab_count(train_sents)
+    #train_sents = preprocess_sent(vocab, train_sents)
+    #pkl.dump( train_sents, open( "train_sents.p", "wb" ) )
+    #dev_sents = preprocess_sent(vocab, dev_sents)
+    #pkl.dump( dev_sents, open( "dev_sents.p", "wb" ) )
 
-    tag_to_idx_dict = build_tag_to_idx_dict(train_sents)
-    index_to_tag_dict = invert_dict(tag_to_idx_dict)
-    freq_word_tag = frequent_train(train_sents, tag_to_idx_dict)
+    #tag_to_idx_dict = build_tag_to_idx_dict(train_sents)
+    #pkl.dump( tag_to_idx_dict, open( "tag_to_idx_dict.p", "wb" ) )
+    #index_to_tag_dict = invert_dict(tag_to_idx_dict)
+    #pkl.dump( index_to_tag_dict, open( "index_to_tag_dict.p", "wb" ) )
+    #freq_word_tag = frequent_train(train_sents, tag_to_idx_dict)
+    #pkl.dump( freq_word_tag, open( "freq_word_tag.p", "wb" ) )
     
 
         # The log-linear model training.
         # NOTE: this part of the code is just a suggestion! You can change it as you wish!
 
     vec = DictVectorizer()
-    print "Create train examples"
-    train_examples, train_labels = create_examples(train_sents, tag_to_idx_dict)
-    num_train_examples = len(train_examples)
-    print "#example: " + str(num_train_examples)
-    print "Done"
+    #print "Create train examples"
+    #train_examples, train_labels = create_examples(train_sents, tag_to_idx_dict)
+    #num_train_examples = len(train_examples)
+    #print "#example: " + str(num_train_examples)
+    #print "Done"
 
-    print "Create dev examples"
-    dev_examples, dev_labels = create_examples(dev_sents, tag_to_idx_dict)
-    num_dev_examples = len(dev_examples)
-    print "#example: " + str(num_dev_examples)
-    print "Done"
+    #print "Create dev examples"
+    #dev_examples, dev_labels = create_examples(dev_sents, tag_to_idx_dict)
+    #num_dev_examples = len(dev_examples)
+    #print "#example: " + str(num_dev_examples)
+    #print "Done"
 
-    all_examples = train_examples
-    all_examples.extend(dev_examples)
+    #all_examples = train_examples
+    #all_examples.extend(dev_examples)
+
+    #pkl.dump( all_examples, open( "all_examples.p", "wb" ) )
+
+    #all_examples = pkl.load( open ("all_examples.p", "rb") )
+    index_to_tag_dict = pkl.load( open ("index_to_tag_dict.p", "rb") )
+    tag_to_idx_dict = pkl.load( open ("tag_to_idx_dict.p", "rb") )
+    train_sents = pkl.load( open ("train_sents.p", "rb") )
+    dev_sents = pkl.load( open ("dev_sents.p", "rb") )
+    freq_word_tag = pkl.load( open ("freq_word_tag.p", "rb") )
+
 
     print "Vectorize examples"
-    all_examples_vectorized = vec.fit_transform(all_examples)
-    with open('vec.bin', 'wb') as f:
-       pkl.dump(vec, f)
+    #all_examples_vectorized = vec.fit_transform(all_examples)
+    #with open('vec.bin', 'wb') as f:
+    #   pkl.dump(vec, f)
+    #scipy.sparse.save_npz('all_examples_vectorized.npz', all_examples_vectorized)
 
-    train_examples_vectorized = all_examples_vectorized[:num_train_examples]
+    #train_examples_vectorized = all_examples_vectorized[:num_train_examples]
+    #scipy.sparse.save_npz('train_examples_vectorized.npz', train_examples_vectorized)
 
-    dev_examples_vectorized = all_examples_vectorized[num_train_examples:]
+    #dev_examples_vectorized = all_examples_vectorized[num_train_examples:]
+    #scipy.sparse.save_npz('dev_examples_vectorized.npz', dev_examples_vectorized)
 
     print "Done"
 
-    logreg = linear_model.LogisticRegression(
-        multi_class='multinomial', max_iter=128, solver='lbfgs', C=100000, verbose=1)
-    print "Fitting..."
-    start = time.time()
-    logreg.fit(train_examples_vectorized, train_labels)
-    end = time.time()
-    print "End training, elapsed " + str(end - start) + " seconds"
+    #logreg = linear_model.LogisticRegression(
+    #    multi_class='multinomial', max_iter=128, solver='lbfgs', C=100000, verbose=1)
+    #print "Fitting..."
+    #start = time.time()
+    #logreg.fit(train_examples_vectorized, train_labels)
+    #end = time.time()
+    #print "End training, elapsed " + str(end - start) + " seconds"
+    #filename = 'memm_logreg.sav'
+    #pickle.dump(logreg, open(filename, 'wb'))
         # End of log linear model training
 
         # Evaluation code - do not make any changes
+    logreg = pickle.load(open("memm_logreg.sav", 'rb'))
+    #all_examples_vectorized = scipy.sparse.load_npz('all_examples_vectorized.npz')
+    #train_examples_vectorized = scipy.sparse.load_npz('train_examples_vectorized.npz')
+    dev_examples_vectorized = scipy.sparse.load_npz('dev_examples_vectorized.npz')
+    with open('vec.bin', 'rb') as f:
+       vec =  pkl.load(f)
     start = time.time()
     print "Start evaluation on dev set"
     

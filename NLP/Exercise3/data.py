@@ -50,7 +50,7 @@ def replace_word(word):
         Replaces rare words with categories (numbers, dates, etc...)
     """
     ### YOUR CODE HERE
-    raise NotImplementedError
+    #raise NotImplementedError
     ### END YOUR CODE
     return "UNK"
 
