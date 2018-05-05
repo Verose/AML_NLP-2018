@@ -1,10 +1,14 @@
 from __future__ import division
+
+import operator
+import os
+from collections import defaultdict
+
+import numpy as np
+
+import tester
 from data import *
 from submitters_details import get_details
-import tester
-from collections import defaultdict
-import operator
-import numpy as np
 
 
 def most_frequent_train(train_data):
