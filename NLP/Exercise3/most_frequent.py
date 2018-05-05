@@ -86,8 +86,8 @@ def values_to_propabillity(x):
 
 if __name__ == "__main__":
     print (get_details())
-    train_sents = read_conll_pos_file("Penn_Treebank/train.gold.conll")
-    dev_sents = read_conll_pos_file("Penn_Treebank/dev.gold.conll")
+    train_sents = read_conll_pos_file("data/Penn_Treebank/train.gold.conll")
+    dev_sents = read_conll_pos_file("data/Penn_Treebank/dev.gold.conll")
     vocab = compute_vocab_count(train_sents)
     train_sents = preprocess_sent(vocab, train_sents)
     dev_sents = preprocess_sent(vocab, dev_sents)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     tester.verify_most_frequent_model(model)
 
-    if os.path.exists('Penn_Treebank/test.gold.conll'):
-        test_sents = read_conll_pos_file("Penn_Treebank/test.gold.conll")
+    if os.path.exists('data/Penn_Treebank/test.gold.conll'):
+        test_sents = read_conll_pos_file("data/Penn_Treebank/test.gold.conll")
         test_sents = preprocess_sent(vocab, test_sents)
         print "test: most frequent acc: " + most_frequent_eval(test_sents, model)
