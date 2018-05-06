@@ -31,8 +31,8 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     features['bigram'] = prev_tag
     features['uigram'] = ''
 
-    features['prevword'] = next_word
-    features['nextword'] = prev_word
+    features['prevword'] = prev_word
+    features['nextword'] = next_word
     features['prevprevword'] = prevprev_word
 
 
@@ -41,9 +41,9 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     return features
 
 def extract_features(sentence, i, t = None, u = None):
-    curr_word, next_token[0], prev_token[0], prevprev_token[0], prev_token[1], prevprev_token[1] = get_word_tag_params(sentence, i, t = None, u = None)
+    curr_word, next_word, prev_word, prevprev_word, prev_tag, prevprev_tag = get_word_tag_params(sentence, i, t = None, u = None)
     
-    return extract_features_base(curr_word, next_token[0], prev_token[0], prevprev_token[0], prev_token[1], prevprev_token[1])
+    return extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_tag, prevprev_tag)
 
 def get_word_tag_params(sentence, i, t = None, u = None):
     if(t == None):

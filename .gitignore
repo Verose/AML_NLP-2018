@@ -5,3 +5,13 @@
 *.localhistory
 *saved_params*.npy
 *.docx
+*.npz
+*.p
+*.sav
+/NLP/Exercise3/vec.bin
+/NLP/Exercise3/tester.pyc
+/NLP/Exercise3/submitters_details.pyc
+/NLP/Exercise3/most_frequent.pyc
+/NLP/Exercise3/MMEM_with_load.pyc
+/NLP/Exercise3/memm.pyc
+/NLP/Exercise3/data.pyc
