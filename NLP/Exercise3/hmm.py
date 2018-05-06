@@ -104,7 +104,8 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     return predicted_tags
 
 
-def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts, e_tag_counts):
+def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts, e_tag_counts,
+             lambda1, lambda2):
     """
     Receives: test data set and the parameters learned by hmm
     Returns an evaluation of the accuracy of hmm
@@ -112,8 +113,6 @@ def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e
     print "Start evaluation"
     acc_viterbi = 0.0
     # YOUR CODE HERE
-    lambda1 = .05
-    lambda2 = .85
     correct = 0
     count = 0
 
@@ -143,10 +142,12 @@ if __name__ == "__main__":
     train_sents = preprocess_sent(vocab, train_sents)
     dev_sents = preprocess_sent(vocab, dev_sents)
 
+    lambda1 = 0.7
+    lambda2 = 0.25
     total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts, e_tag_counts = hmm_train(train_sents)
     verify_hmm_model(total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts, e_tag_counts)
     acc_viterbi = hmm_eval(dev_sents, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,
-                           e_tag_counts)
+                           e_tag_counts, lambda1, lambda2)
     print "Dev: Accuracy of Viterbi hmm: " + acc_viterbi
 
     train_dev_time = time.time()
@@ -155,8 +156,8 @@ if __name__ == "__main__":
     if os.path.exists("data/Penn_Treebank/test.gold.conll"):
         test_sents = read_conll_pos_file("data/Penn_Treebank/test.gold.conll")
         test_sents = preprocess_sent(vocab, test_sents)
-        acc_viterbi = hmm_eval(test_sents, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts,
-                               e_word_tag_counts, e_tag_counts)
+        acc_viterbi = hmm_eval(test_sents, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,
+                               e_tag_counts, lambda1, lambda2)
         print "Test: Accuracy of Viterbi hmm: " + acc_viterbi
         full_flow_end = time.time()
         print "Full flow elapsed: " + str(full_flow_end - start_time) + " seconds"
