@@ -153,7 +153,7 @@ if __name__ == "__main__":
     train_dev_time = time.time()
     print "Train and dev evaluation elapsed: " + str(train_dev_time - start_time) + " seconds"
 
-    if os.path.exists("data/Penn_Treebank/test.gold.conll"):
+    if os.path.exists("Penn_Treebank/test.gold.conll"):
         test_sents = read_conll_pos_file("Penn_Treebank/test.gold.conll")
         test_sents = preprocess_sent(vocab, test_sents)
         acc_viterbi = hmm_eval(test_sents, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,
