@@ -31,8 +31,8 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     features['bigram'] = prev_tag
     features['uigram'] = ''
 
-    features['prevword'] = next_word
-    features['nextword'] = prev_word
+    features['prevword'] = prev_word
+    features['nextword'] = next_word
     features['prevprevword'] = prevprev_word
 
     features['capitalletter'] = (len(curr_word) > 0) and (curr_word[0].isupper())
@@ -41,14 +41,9 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
 
 
 def extract_features(sentence, i, t=None, u=None):
-    prev_token = []
-    prevprev_token = []
-
-    curr_word, next_token, prev_token[0], prevprev_token[0], prev_token[1], prevprev_token[1] = get_word_tag_params(
-        sentence, i, t=None, u=None)
-
-    return extract_features_base(curr_word, next_token[0], prev_token[0], prevprev_token[0], prev_token[1],
-                                 prevprev_token[1])
+    curr_word, next_word, prev_word, prevprev_word, prev_tag, prevprev_tag = get_word_tag_params(sentence, i, t, u)
+    
+    return extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_tag, prevprev_tag)
 
 
 def get_word_tag_params(sentence, i, t=None, u=None):
@@ -109,7 +104,7 @@ def memm_greeedy(sent, test_data_vectorized, words_count, logreg, vec, index_to_
 
 
 def memm_viterbi(sent, test_data_vectorized, words_count, logreg, vec, index_to_tag_dict, return_dict=None,
-                 freq_word_tag=None, process_idx=None):
+                 freq_word_tag=None, process_idx=-1):
     """
         Receives: a sentence to tag and the parameters learned by memm
         Returns: predicted tags for the sentence
@@ -164,10 +159,9 @@ def memm_viterbi(sent, test_data_vectorized, words_count, logreg, vec, index_to_
     for idx in range(len(sent) - 3, -1, -1):
         predicted_tags[idx] = back_pointers[idx + 3][predicted_tags[idx + 1]][predicted_tags[idx + 2]]
 
-    if not process_idx:
+    if process_idx == -1:
         return predicted_tags
 
-    # todo dvir: what did you mean here?
     return_dict[process_idx] = predicted_tags
 
 
