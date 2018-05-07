@@ -135,8 +135,8 @@ def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e
 if __name__ == "__main__":
     print (get_details())
     start_time = time.time()
-    train_sents = read_conll_pos_file("data/Penn_Treebank/train.gold.conll")
-    dev_sents = read_conll_pos_file("data/Penn_Treebank/dev.gold.conll")
+    train_sents = read_conll_pos_file("Penn_Treebank/train.gold.conll")
+    dev_sents = read_conll_pos_file("Penn_Treebank/dev.gold.conll")
     vocab = compute_vocab_count(train_sents)
 
     train_sents = preprocess_sent(vocab, train_sents)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     print "Train and dev evaluation elapsed: " + str(train_dev_time - start_time) + " seconds"
 
     if os.path.exists("data/Penn_Treebank/test.gold.conll"):
-        test_sents = read_conll_pos_file("data/Penn_Treebank/test.gold.conll")
+        test_sents = read_conll_pos_file("Penn_Treebank/test.gold.conll")
         test_sents = preprocess_sent(vocab, test_sents)
         acc_viterbi = hmm_eval(test_sents, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,
                                e_tag_counts, lambda1, lambda2)
