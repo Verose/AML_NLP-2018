@@ -14,9 +14,10 @@ import sys
 import tensorflow as tf
 import numpy as np
 
-logger = logging.getLogger("hw3.q2.1")
+logger = logging.getLogger("hw4.q2.1")
 logger.setLevel(logging.DEBUG)
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
 
 class RNNCell(tf.nn.rnn_cell.RNNCell):
     """Wrapper around our RNN cell implementation that allows us to play
@@ -42,7 +43,7 @@ class RNNCell(tf.nn.rnn_cell.RNNCell):
 
         TODO: In the code below, implement an RNN cell using @inputs
         (x_t above) and the state (h_{t-1} above).
-            - Define W_x, W_h, b to be variables of the apporiate shape
+            - Define W_x, W_h, b to be variables of the appropriate shape
               using the `tf.get_variable' functions. Make sure you use
               the names "W_x", "W_h" and "b"!
             - Compute @new_state (h_t) defined above
@@ -61,24 +62,43 @@ class RNNCell(tf.nn.rnn_cell.RNNCell):
         # It's always a good idea to scope variables in functions lest they
         # be defined elsewhere!
         with tf.variable_scope(scope):
-            ### YOUR CODE HERE (~6-10 lines)
-
-            ### END YOUR CODE ###
+            # YOUR CODE HERE (~6-10 lines)
+            W_x = tf.get_variable(
+                "W_x",
+                shape=[self.input_size, self.state_size],
+                initializer=tf.contrib.layers.xavier_initializer()
+            )
+            W_h = tf.get_variable(
+                "W_h",
+                shape=[self.state_size, self.state_size],
+                initializer=tf.contrib.layers.xavier_initializer()
+            )
+            b = tf.get_variable(
+                "b",
+                shape=[self.state_size],
+                initializer=tf.constant_initializer(0.)
+            )
+            new_state = tf.sigmoid(
+                tf.matmul(inputs, W_x) +
+                tf.matmul(state, W_h) + b
+            )
+            # END YOUR CODE ###
         # For an RNN , the output and state are the same (N.B. this
         # isn't true for an LSTM, though we aren't using one of those in
         # our assignment)
         output = new_state
         return output, new_state
 
+
 def test_rnn_cell():
     with tf.Graph().as_default():
         with tf.variable_scope("test_rnn_cell"):
-            x_placeholder = tf.placeholder(tf.float32, shape=(None,3))
-            h_placeholder = tf.placeholder(tf.float32, shape=(None,2))
+            x_placeholder = tf.placeholder(tf.float32, shape=(None, 3))
+            h_placeholder = tf.placeholder(tf.float32, shape=(None, 2))
 
             with tf.variable_scope("rnn"):
-                tf.get_variable("W_x", initializer=np.array(np.eye(3,2), dtype=np.float32))
-                tf.get_variable("W_h", initializer=np.array(np.eye(2,2), dtype=np.float32))
+                tf.get_variable("W_x", initializer=np.array(np.eye(3, 2), dtype=np.float32))
+                tf.get_variable("W_h", initializer=np.array(np.eye(2, 2), dtype=np.float32))
                 tf.get_variable("b",  initializer=np.array(np.ones(2), dtype=np.float32))
 
             tf.get_variable_scope().reuse_variables()
@@ -106,13 +126,15 @@ def test_rnn_cell():
                 assert np.allclose(y_, ht_), "output and state should be equal."
                 assert np.allclose(ht, ht_, atol=1e-2), "new state vector does not seem to be correct."
 
+
 def do_test(_):
     logger.info("Testing rnn_cell")
     test_rnn_cell()
     logger.info("Passed!")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Tests the RNN cell implemented as part of Q2 of Homework 3')
+    parser = argparse.ArgumentParser(description='Tests the RNN cell implemented as part of Q2 of Homework 4')
     subparsers = parser.add_subparsers()
 
     command_parser = subparsers.add_parser('test', help='')
