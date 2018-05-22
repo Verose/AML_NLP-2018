@@ -12,7 +12,7 @@ from data_util import get_chunks
 from model import Model
 from defs import LBLS
 
-logger = logging.getLogger("hw3")
+logger = logging.getLogger("hw4")
 logger.setLevel(logging.DEBUG)
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
