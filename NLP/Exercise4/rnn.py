@@ -621,6 +621,7 @@ def do_train(args):
                 with open(model.config.conll_output, 'w') as f:
                     write_conll(f, output)
                 with open(model.config.eval_output, 'w') as f:
+                    output = zip(sentences, labels, predictions)
                     for sentence, labels, predictions in output:
                         print_sentence(f, sentence, labels, predictions)
 
