@@ -323,7 +323,12 @@ class RNNModel(NERModel):
             pred: tf.Tensor of shape (batch_size, max_length, n_classes)
         """
         ### YOUR CODE HERE (~4-6 lines)
-        raise NotImplemented
+        gru_cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.GRUCell(num_units=self.config.hidden_size, kernel_initializer=tf.contrib.layers.xavier_initializer(),
+                                         bias_initializer=tf.zeros_initializer()), output_keep_prob=dropout_rate)
+
+        final_net_output, _ = tf.nn.dynamic_rnn(gru_cell,x, dtype = tf.float32)
+
+        preds = tf.layers.dense(output, Config.n_classes, kernel_initializer=tf.contrib.layers.xavier_initializer(),bias_initializer=tf.zeros_initializer())
         ### END YOUR CODE
 
         return preds
@@ -432,7 +437,18 @@ class RNNModel(NERModel):
         records = []
 
         ### YOUR CODE HERE (~5-10 lines)
+        records.append(tf.summary.scalar("loss_summary", loss))
+        
+        records.append(tf.summary.histogram("histogram_summary",pred))
+        
+        self.probs = tf.nn.softmax(pred)
+        to_boolean_preds = tf.boolean_mask(pred, self.mask_placeholder)
 
+        # loss function
+        entropy = -tf.reduce_sum(to_boolean_preds * tf.log(tf.clip_by_value(to_boolean_preds,1e-15,1.0)), axis=1)
+
+        reduced_mean_entropy = tf.reduce_mean(entropy)
+        records.append(tf.summary.scalar("reduced_mean_entropy_summary", reduced_mean_entropy))
         ### END YOUR CODE
 
         assert hasattr(self, 'probs'), "self.probs should be set."
