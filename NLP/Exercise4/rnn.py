@@ -328,7 +328,7 @@ class RNNModel(NERModel):
 
         final_net_output, _ = tf.nn.dynamic_rnn(gru_cell,x, dtype = tf.float32)
 
-        preds = tf.layers.dense(output, Config.n_classes, kernel_initializer=tf.contrib.layers.xavier_initializer(),bias_initializer=tf.zeros_initializer())
+        preds = tf.layers.dense(final_net_output, Config.n_classes, kernel_initializer=tf.contrib.layers.xavier_initializer(),bias_initializer=tf.zeros_initializer())
         ### END YOUR CODE
 
         return preds
@@ -438,6 +438,7 @@ class RNNModel(NERModel):
 
         ### YOUR CODE HERE (~5-10 lines)
         records.append(tf.summary.scalar("loss_summary", loss))
+        records.append(tf.summary.scalar("loss_reduce_mean_summary", tf.reduce_mean(loss)))
         
         records.append(tf.summary.histogram("histogram_summary",pred))
         
