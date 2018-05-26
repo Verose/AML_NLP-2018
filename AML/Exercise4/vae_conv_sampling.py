@@ -65,11 +65,13 @@ outputs = Conv2D(1, (3, 3), activation='sigmoid', padding='same', name='Conv2D5'
 
 decoder = Model(pre_decoder_inputs, outputs, name='decoder')
 
-vae = Model(inputs, outputs, name='vae')
+final_output = decoder(encoder(inputs)[2])
+
+vae = Model(inputs, final_output, name='vae')
 
 
 # Compute VAE loss
-xent_loss = original_dim * metrics.binary_crossentropy(x, outputs)
+xent_loss = original_dim * metrics.binary_crossentropy(K.flatten(inputs),K.flatten(final_output))
 kl_loss = - 0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
 vae_loss = K.mean(xent_loss + kl_loss)
 
@@ -83,8 +85,8 @@ vae.summary()
 
 x_train = x_train.astype('float32') / 255.
 x_test = x_test.astype('float32') / 255.
-x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
-x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
+x_train = np.reshape(x_train,[-1,x_train.shape[1],x_train.shape[1],1])
+x_test = np.reshape(x_test,[-1,x_train.shape[1],x_train.shape[1],1])
 
 vae.fit(x_train,
         shuffle=True,
@@ -124,7 +126,7 @@ if __name__ == '__main__':
     y_progress_first_second = np.linspace(first_img_latent_repr[0][1],second_img_latent_repr[0][1],10)
 
     for image_progress_idx in range(len(x_progress_first_second)):
-        image_progress = generator.predict(np.asarray([np.asarray((x_progress_first_second[image_progress_idx],y_progress_first_second[image_progress_idx]))]))
+        image_progress = decoder.predict(np.asarray([np.asarray((x_progress_first_second[image_progress_idx],y_progress_first_second[image_progress_idx]))]))
         image_progress = image_progress.reshape((28,28))
 
         plt.imsave("image_progress_convnet__" + str(image_progress_idx) + '.png', image_progress)
