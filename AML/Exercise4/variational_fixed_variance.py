@@ -36,7 +36,7 @@ def sampling(args):
     z_mean, z_log_var = args
     epsilon = K.random_normal(shape=(K.shape(z_mean)[0], latent_dim), mean=0.,
                               stddev=epsilon_std)
-    return z_mean + K.exp(z_log_var / 2) * epsilon
+    return z_mean
 
 z = Lambda(sampling, output_shape=(latent_dim,))([z_mean, z_log_var])
 
@@ -59,7 +59,7 @@ vae = Model(x, x_decoded_mean)
 
 # Compute VAE loss
 xent_loss = original_dim * metrics.binary_crossentropy(x, x_decoded_mean)
-kl_loss = - 0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
+kl_loss = - 0.5 * K.sum(- K.square(z_mean), axis=-1)
 vae_loss = K.mean(xent_loss + kl_loss)
 
 vae.add_loss(vae_loss)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     for idx in range(10):
         ax.annotate(idx, (z_mean[idx][0],z_mean[idx][1]))
-    fig.savefig("latent_images")
+    fig.savefig("latent_images_const_variance")
 
     first_img = x_test[0]
     first_label = y_test[0]
@@ -116,4 +116,4 @@ if __name__ == '__main__':
         image_progress = generator.predict(np.asarray([np.asarray((x_progress_first_second[image_progress_idx],y_progress_first_second[image_progress_idx]))]))
         image_progress = image_progress.reshape((28,28))
 
-        plt.imsave("image_progress__" + str(image_progress_idx) + '.png', image_progress)
+        plt.imsave("image_progress_const_variance__" + str(image_progress_idx) + '.png', image_progress)
