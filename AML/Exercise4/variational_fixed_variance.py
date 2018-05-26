@@ -18,11 +18,11 @@ from keras import backend as K
 from keras import metrics
 from keras.datasets import mnist
 
-batch_size = 10
+batch_size = 100
 original_dim = 784
 latent_dim = 2
 intermediate_dim = 256
-epochs = 0
+epochs = 50
 epsilon_std = 1.0
 
 
