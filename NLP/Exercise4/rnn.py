@@ -322,14 +322,16 @@ class RNNModel(NERModel):
         Returns:
             pred: tf.Tensor of shape (batch_size, max_length, n_classes)
         """
-        ### YOUR CODE HERE (~4-6 lines)
-        gru_cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.GRUCell(num_units=self.config.hidden_size, kernel_initializer=tf.contrib.layers.xavier_initializer(),
-                                         bias_initializer=tf.zeros_initializer()), output_keep_prob=dropout_rate)
+        # YOUR CODE HERE (~4-6 lines)
+        gru_cell = tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.GRUCell(num_units=self.config.hidden_size),
+                                                 output_keep_prob=dropout_rate)
 
-        final_net_output, _ = tf.nn.dynamic_rnn(gru_cell,x, dtype = tf.float32)
+        final_net_output, _ = tf.nn.dynamic_rnn(gru_cell, x, dtype=tf.float32)
 
-        preds = tf.layers.dense(final_net_output, Config.n_classes, kernel_initializer=tf.contrib.layers.xavier_initializer(),bias_initializer=tf.zeros_initializer())
-        ### END YOUR CODE
+        preds = tf.layers.dense(final_net_output, Config.n_classes,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer(),
+                                bias_initializer=tf.zeros_initializer())
+        # END YOUR CODE
 
         return preds
 
@@ -411,18 +413,18 @@ class RNNModel(NERModel):
         Generates summaries about the model to be displayed by TensorBoard.
         https://www.tensorflow.org/api_docs/python/tf/summary
         for more information.
-        
+
         TODO: Append to the 'records' list 3 summaries:
             - add histogram summary of the prediction logits (pred)
             - a scalar summary of the average loss (loss)
             - a scalar summary of the average prediction entropy:
-                - transform the prediction logits tensors into probability tensors, by directly applying softmax. 
+                - transform the prediction logits tensors into probability tensors, by directly applying softmax.
                   You can use the function tf.nn.softmax
                     https://www.tensorflow.org/api_docs/python/tf/nn/softmax
                 - store the results in "self.probs" (self.probs = ...)
                 - use these probabilities to calculate the entropy, also use the function tf.log
                     https://www.tensorflow.org/api_docs/python/tf/log
-            
+
         Remember: clip the probability values before applying the logarithm function, with
                   the function tf.clip_by_value.
                     https://www.tensorflow.org/api_docs/python/tf/clip_by_value
@@ -436,21 +438,21 @@ class RNNModel(NERModel):
         """
         records = []
 
-        ### YOUR CODE HERE (~5-10 lines)
+        # YOUR CODE HERE (~5-10 lines)
         records.append(tf.summary.scalar("loss_summary", loss))
         records.append(tf.summary.scalar("loss_reduce_mean_summary", tf.reduce_mean(loss)))
-        
-        records.append(tf.summary.histogram("histogram_summary",pred))
-        
+
+        records.append(tf.summary.histogram("histogram_summary", pred))
+
         self.probs = tf.nn.softmax(pred)
-        to_boolean_preds = tf.boolean_mask(pred, self.mask_placeholder)
+        to_boolean_preds = tf.boolean_mask(self.probs, self.mask_placeholder)
 
         # loss function
-        entropy = -tf.reduce_sum(to_boolean_preds * tf.log(tf.clip_by_value(to_boolean_preds,1e-15,1.0)), axis=1)
+        entropy = -tf.reduce_sum(to_boolean_preds * tf.log(tf.clip_by_value(to_boolean_preds, 1e-15, 1.0)), axis=1)
 
         reduced_mean_entropy = tf.reduce_mean(entropy)
         records.append(tf.summary.scalar("reduced_mean_entropy_summary", reduced_mean_entropy))
-        ### END YOUR CODE
+        # END YOUR CODE
 
         assert hasattr(self, 'probs'), "self.probs should be set."
         summary = tf.summary.merge(records)
