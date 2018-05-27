@@ -18,11 +18,11 @@ from keras import backend as K
 from keras import metrics
 from keras.datasets import mnist
 
-batch_size = 100
+batch_size = 1
 original_dim = 784
 latent_dim = 2
 intermediate_dim = 256
-epochs = 50
+epochs = 0
 epsilon_std = 1.0
 
 
@@ -54,7 +54,8 @@ x_decoded_mean = decoder_mean(h_decoded)
 decoder_input = Input(shape=(latent_dim,))
 _h_decoded = decoder_h(decoder_input)
 _x_decoded_mean = decoder_mean(_h_decoded)
-generator = Model(inputs=decoder_input, outputs= _x_decoded_mean)
+generator = Model(inputs=decoder_input, outputs= _x_decoded_mean)
+
 
 # instantiate VAE model
 vae = Model(x, x_decoded_mean)
@@ -94,7 +95,7 @@ if __name__ == '__main__':
         if(cur_digit == 10):
             break
 
-    z_mean, _, _ = encoder.predict(np.asarray(test_samples_by_digit))
+    z_mean = encoder.predict(np.asarray(test_samples_by_digit))
     colors = cm.rainbow(np.linspace(0, 1, len(test_samples_by_digit)))
     fig, ax = plt.subplots()
     ax.scatter([point[0] for point in z_mean], [point[1] for point in z_mean], color=colors)
@@ -102,14 +103,24 @@ if __name__ == '__main__':
     for idx in range(10):
         ax.annotate(idx, (z_mean[idx][0],z_mean[idx][1]))
     fig.savefig("latent_images_const_variance")
+    table_txt = str([point[0] for point in z_mean]) + '\n' + str([point[1] for point in z_mean])
+    text_file = open("z_mean_fixed_var_table.txt", "w")
+    text_file.write(table_txt)
+    text_file.close()
+
+    z_sample = np.array([[0.5, 0.2]])
+    x_decoded_sample = generator.predict(z_sample)
+    x_decoded_sample = x_decoded_sample.reshape((28,28))
+    plt.imsave("x_decoded_sample_const_variance" + '.png', x_decoded_sample)
+
 
     first_img = x_test[0]
     first_label = y_test[0]
-    first_img_latent_repr, _, _ = encoder.predict(np.asarray([np.asarray(first_img)]))
+    first_img_latent_repr = encoder.predict(np.asarray([np.asarray(first_img)]))
     
     second_img = x_test[1]
     second_label = y_test[1]
-    second_img_latent_repr, _, _ = encoder.predict(np.asarray([np.asarray(second_img)]))
+    second_img_latent_repr = encoder.predict(np.asarray([np.asarray(second_img)]))
 
     x_progress_first_second = np.linspace(first_img_latent_repr[0][0],second_img_latent_repr[0][0],10)
     y_progress_first_second = np.linspace(first_img_latent_repr[0][1],second_img_latent_repr[0][1],10)

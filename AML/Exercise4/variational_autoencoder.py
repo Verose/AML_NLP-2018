@@ -52,7 +52,8 @@ x_decoded_mean = decoder_mean(h_decoded)
 decoder_input = Input(shape=(latent_dim,))
 _h_decoded = decoder_h(decoder_input)
 _x_decoded_mean = decoder_mean(_h_decoded)
-generator = Model(inputs=decoder_input, outputs= _x_decoded_mean)
+generator = Model(inputs=decoder_input, outputs= _x_decoded_mean)
+
 
 # instantiate VAE model
 vae = Model(x, x_decoded_mean)
@@ -100,6 +101,16 @@ if __name__ == '__main__':
     for idx in range(10):
         ax.annotate(idx, (z_mean[idx][0],z_mean[idx][1]))
     fig.savefig("latent_images")
+
+    table_txt = str([point[0] for point in z_mean]) + '\n' + str([point[1] for point in z_mean])
+    text_file = open("z_mean_table.txt", "w")
+    text_file.write(table_txt)
+    text_file.close()
+
+    z_sample = np.array([[0.5, 0.2]])
+    x_decoded_sample = generator.predict(z_sample)
+    x_decoded_sample = x_decoded_sample.reshape((28,28))
+    plt.imsave("x_decoded_sample" + '.png', x_decoded_sample)
 
     first_img = x_test[0]
     first_label = y_test[0]

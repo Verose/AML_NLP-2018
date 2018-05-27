@@ -113,6 +113,15 @@ if __name__ == '__main__':
     for idx in range(10):
         ax.annotate(idx, (z_mean[idx][0],z_mean[idx][1]))
     fig.savefig("latent_images_convnet")
+    table_txt = str([point[0] for point in z_mean]) + '\n' + str([point[1] for point in z_mean])
+    text_file = open("z_mean_convnet_table.txt", "w")
+    text_file.write(table_txt)
+    text_file.close()
+
+    z_sample = np.array([[0.5, 0.2]])
+    x_decoded_sample = generator.predict(z_sample)
+    x_decoded_sample = x_decoded_sample.reshape((28,28))
+    plt.imsave("x_decoded_sample_convnet" + '.png', x_decoded_sample)
 
     first_img = x_test[0]
     first_label = y_test[0]
