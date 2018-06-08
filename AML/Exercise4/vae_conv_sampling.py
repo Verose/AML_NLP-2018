@@ -119,7 +119,7 @@ if __name__ == '__main__':
     text_file.close()
 
     z_sample = np.array([[0.5, 0.2]])
-    x_decoded_sample = generator.predict(z_sample)
+    x_decoded_sample = decoder.predict(z_sample)
     x_decoded_sample = x_decoded_sample.reshape((28,28))
     plt.imsave("x_decoded_sample_convnet" + '.png', x_decoded_sample)
 
