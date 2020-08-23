@@ -1,5 +1,0 @@
-decoder {
-    test_exploration_policy {
-        beam_size = 256
-    }
-}

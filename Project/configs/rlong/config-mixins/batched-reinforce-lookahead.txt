@@ -1,7 +1,0 @@
-# Add batched-reinforce-basic first!
-
-decoder {
-    train_exploration_policy {
-        termination_lookahead = True
-    }
-}

@@ -1,5 +1,0 @@
-decoder {
-    train_exploration_policy {
-        zombie_mode = True
-    }
-}

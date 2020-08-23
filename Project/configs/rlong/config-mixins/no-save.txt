@@ -1,4 +1,0 @@
-# Don't ever bother saving
-timing {
-    save = 10000000000000000000000
-}
